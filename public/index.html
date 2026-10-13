@@ -17,34 +17,44 @@
             text-align: center;
             vertical-align: middle;
         }
+        /* Transisi halus saat sidebar disembunyikan/ditampilkan */
+        #sidebar {
+            transition: transform 0.3s ease-in-out, width 0.3s ease-in-out;
+        }
     </style>
 </head>
 <body class="bg-slate-50 text-slate-800 font-sans antialiased">
 
     <div class="flex h-screen overflow-hidden">
         
-        <!-- Left Sidebar Navigation -->
-        <aside class="w-64 bg-indigo-900 text-white flex flex-col shadow-lg z-20">
+        <!-- Left Sidebar Navigation dengan ID sidebar untuk autohide -->
+        <aside id="sidebar" class="w-64 bg-indigo-900 text-white flex flex-col shadow-lg z-20 shrink-0">
             <!-- Sidebar Header -->
-            <div class="p-5 border-b border-indigo-800 flex items-center space-x-3">
-                <i class="fa-solid fa-chart-line text-2xl text-indigo-300"></i>
-                <span class="font-bold text-lg tracking-wide">SLA DASHBOARD</span>
+            <div class="p-5 border-b border-indigo-800 flex items-center justify-between">
+                <div class="flex items-center space-x-3">
+                    <i class="fa-solid fa-chart-line text-2xl text-indigo-300"></i>
+                    <span class="font-bold text-lg tracking-wide sidebar-text">SLA DASHBOARD</span>
+                </div>
+                <!-- Tombol Close Sidebar di dalam sidebar -->
+                <button onclick="toggleSidebar()" class="text-indigo-300 hover:text-white lg:hidden">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
             </div>
             
             <!-- Navigation Links -->
             <nav class="flex-1 px-4 py-6 space-y-2">
                 <button onclick="switchPage('page1')" id="nav-page1" class="w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-sm font-medium transition bg-indigo-800 text-white shadow-sm">
                     <i class="fa-solid fa-house w-5 text-center"></i>
-                    <span>Dashboard</span>
+                    <span class="sidebar-text">Halaman 1: Dashboard</span>
                 </button>
                 <button onclick="switchPage('page2')" id="nav-page2" class="w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-sm font-medium transition text-indigo-200 hover:bg-indigo-800 hover:text-white">
                     <i class="fa-solid fa-table w-5 text-center"></i>
-                    <span>Tabel Resume SLA</span>
+                    <span class="sidebar-text">Halaman 2: Tabel Resume SLA</span>
                 </button>
             </nav>
 
             <!-- Sidebar Footer -->
-            <div class="p-4 border-t border-indigo-800 text-xs text-indigo-300 text-center">
+            <div class="p-4 border-t border-indigo-800 text-xs text-indigo-300 text-center sidebar-text">
                 &copy; 2026 SLA Management
             </div>
         </aside>
@@ -54,7 +64,13 @@
             
             <!-- Top Header Bar -->
             <header class="bg-white border-b border-slate-200 px-6 py-4 flex flex-col sm:flex-row justify-between items-center shadow-sm gap-4">
-                <h1 id="header-title" class="text-lg font-bold text-slate-800">Dashboard Utama</h1>
+                <div class="flex items-center space-x-3 w-full sm:w-auto justify-between sm:justify-start">
+                    <!-- Tombol Toggle Autohide Sidebar -->
+                    <button onclick="toggleSidebar()" title="Sembunyikan/Tampilkan Menu" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-700 p-2 rounded-lg border border-indigo-100 text-sm font-medium transition flex items-center justify-center w-9 h-9 shadow-sm">
+                        <i class="fa-solid fa-bars"></i>
+                    </button>
+                    <h1 id="header-title" class="text-lg font-bold text-slate-800">Dashboard Utama</h1>
+                </div>
                 
                 <!-- Kontainer Kanan Atas -->
                 <div class="flex items-center space-x-3">
@@ -178,7 +194,7 @@
                     <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200">
                         <div class="flex justify-between items-center mb-4">
                             <h3 class="text-sm font-bold text-slate-700 uppercase tracking-wider">Tabel Resume Service Level Agreement (SLA) 2026</h3>
-                            
+                            <span class="text-xs bg-indigo-50 text-indigo-700 font-semibold px-2.5 py-1 rounded-md">Struktur Kolom Merger Dipertahankan</span>
                         </div>
                         <div class="overflow-x-auto border border-slate-200 rounded-lg">
                             <table class="w-full text-xs text-slate-700 border-collapse">
@@ -236,6 +252,17 @@
                 setRefreshInterval(Number(savedInterval));
             }
         });
+
+        // Fungsi untuk Autohide Sidebar
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            // Menambah kelas CSS untuk menggeser/menyembunyikan sidebar ke kiri
+            if (sidebar.classList.contains('-translate-x-full')) {
+                sidebar.classList.remove('-translate-x-full');
+            } else {
+                sidebar.classList.add('-translate-x-full');
+            }
+        }
 
         function loadData() {
             fetch(APPS_SCRIPT_URL)
