@@ -17,18 +17,18 @@
             text-align: center;
             vertical-align: middle;
         }
-        /* Transisi halus saat sidebar disembunyikan/ditampilkan */
+        /* Transisi halus saat sidebar disembunyikan */
         #sidebar {
-            transition: transform 0.3s ease-in-out;
+            transition: margin-left 0.3s ease-in-out, transform 0.3s ease-in-out;
         }
     </style>
 </head>
-<body class="bg-slate-50 text-slate-800 font-sans antialiased">
+<body class="bg-slate-50 text-slate-800 font-sans antialiased overflow-hidden">
 
-    <div class="flex h-screen overflow-hidden">
+    <div class="flex h-screen w-screen overflow-hidden relative">
         
-        <!-- Left Sidebar Navigation dengan absolute/fixed behavior agar tidak mendorong layout -->
-        <aside id="sidebar" class="w-64 bg-indigo-900 text-white flex flex-col shadow-lg z-20 shrink-0 transform transition-transform duration-300 ease-in-out">
+        <!-- Left Sidebar Navigation -->
+        <aside id="sidebar" class="w-64 bg-indigo-900 text-white flex flex-col shadow-xl z-30 h-full shrink-0">
             <!-- Sidebar Header -->
             <div class="p-5 border-b border-indigo-800 flex items-center justify-between">
                 <div class="flex items-center space-x-3">
@@ -59,8 +59,8 @@
             </div>
         </aside>
 
-        <!-- Main Content Area (Otomatis mengisi ruang kosong saat sidebar ditutup) -->
-        <div class="flex-1 flex flex-col overflow-y-auto w-full">
+        <!-- Main Content Area -->
+        <div id="main-content" class="flex-1 flex flex-col h-full overflow-y-auto transition-all duration-300 ease-in-out">
             
             <!-- Top Header Bar -->
             <header class="bg-white border-b border-slate-200 px-6 py-4 flex flex-col sm:flex-row justify-between items-center shadow-sm gap-4">
@@ -222,7 +222,7 @@
                                         <th class="border border-indigo-700 px-1 py-1.5">Melebihi SLA</th>
                                         <th class="border border-indigo-700 px-1 py-1.5 bg-indigo-900">Total</th>
                                         <th class="border border-indigo-700 px-1 py-1.5">Sesuai SLA</th>
-                                        <th class="border border-indigo-700 px-1/1.5">Melebihi SLA</th>
+                                        <th class="border border-indigo-700 px-1 py-1.5">Melebihi SLA</th>
                                         <th class="border border-indigo-700 px-1 py-1.5 bg-indigo-900">Total</th>
                                     </tr>
                                 </thead>
@@ -253,13 +253,18 @@
             }
         });
 
-        // Fungsi Autohide Sidebar + Resize otomatis Chart.js agar memenuhi lebar layar
+        // Fungsi Autohide Sidebar yang menggunakan teknik margin negatif agar sisa ruang langsung terisi penuh
         function toggleSidebar() {
             const sidebar = document.getElementById('sidebar');
-            // Menambah kelas untuk menggeser sidebar keluar layar ke kiri
-            sidebar.classList.toggle('-translate-x-full');
             
-            // Beri sedikit jeda agar animasi CSS selesai, lalu paksa Chart.js menyesuaikan ukuran baru
+            // Toggle kelas untuk melipat sidebar ke kiri luar layar secara absolut
+            if (sidebar.style.marginLeft === '-256px') {
+                sidebar.style.marginLeft = '0px';
+            } else {
+                sidebar.style.marginLeft = '-256px';
+            }
+            
+            // Beri jeda animasi CSS, lalu paksa Chart.js merespons ukuran lebar layar yang baru
             setTimeout(() => {
                 if (window.monthlyChartInstance) window.monthlyChartInstance.resize();
                 if (window.pieChartInstance) window.pieChartInstance.resize();
