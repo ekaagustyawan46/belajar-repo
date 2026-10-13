@@ -19,7 +19,7 @@
         }
         /* Transisi halus saat sidebar disembunyikan/ditampilkan */
         #sidebar {
-            transition: transform 0.3s ease-in-out, width 0.3s ease-in-out;
+            transition: transform 0.3s ease-in-out;
         }
     </style>
 </head>
@@ -27,13 +27,13 @@
 
     <div class="flex h-screen overflow-hidden">
         
-        <!-- Left Sidebar Navigation dengan ID sidebar untuk autohide -->
-        <aside id="sidebar" class="w-64 bg-indigo-900 text-white flex flex-col shadow-lg z-20 shrink-0">
+        <!-- Left Sidebar Navigation dengan absolute/fixed behavior agar tidak mendorong layout -->
+        <aside id="sidebar" class="w-64 bg-indigo-900 text-white flex flex-col shadow-lg z-20 shrink-0 transform transition-transform duration-300 ease-in-out">
             <!-- Sidebar Header -->
             <div class="p-5 border-b border-indigo-800 flex items-center justify-between">
                 <div class="flex items-center space-x-3">
                     <i class="fa-solid fa-chart-line text-2xl text-indigo-300"></i>
-                    <span class="font-bold text-lg tracking-wide sidebar-text">SLA DASHBOARD</span>
+                    <span class="font-bold text-lg tracking-wide">SLA DASHBOARD</span>
                 </div>
                 <!-- Tombol Close Sidebar di dalam sidebar -->
                 <button onclick="toggleSidebar()" class="text-indigo-300 hover:text-white lg:hidden">
@@ -45,22 +45,22 @@
             <nav class="flex-1 px-4 py-6 space-y-2">
                 <button onclick="switchPage('page1')" id="nav-page1" class="w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-sm font-medium transition bg-indigo-800 text-white shadow-sm">
                     <i class="fa-solid fa-house w-5 text-center"></i>
-                    <span class="sidebar-text">Halaman 1: Dashboard</span>
+                    <span>Halaman 1: Dashboard</span>
                 </button>
                 <button onclick="switchPage('page2')" id="nav-page2" class="w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-sm font-medium transition text-indigo-200 hover:bg-indigo-800 hover:text-white">
                     <i class="fa-solid fa-table w-5 text-center"></i>
-                    <span class="sidebar-text">Halaman 2: Tabel Resume SLA</span>
+                    <span>Halaman 2: Tabel Resume SLA</span>
                 </button>
             </nav>
 
             <!-- Sidebar Footer -->
-            <div class="p-4 border-t border-indigo-800 text-xs text-indigo-300 text-center sidebar-text">
+            <div class="p-4 border-t border-indigo-800 text-xs text-indigo-300 text-center">
                 &copy; 2026 SLA Management
             </div>
         </aside>
 
-        <!-- Main Content Area -->
-        <div class="flex-1 flex flex-col overflow-y-auto">
+        <!-- Main Content Area (Otomatis mengisi ruang kosong saat sidebar ditutup) -->
+        <div class="flex-1 flex flex-col overflow-y-auto w-full">
             
             <!-- Top Header Bar -->
             <header class="bg-white border-b border-slate-200 px-6 py-4 flex flex-col sm:flex-row justify-between items-center shadow-sm gap-4">
@@ -222,7 +222,7 @@
                                         <th class="border border-indigo-700 px-1 py-1.5">Melebihi SLA</th>
                                         <th class="border border-indigo-700 px-1 py-1.5 bg-indigo-900">Total</th>
                                         <th class="border border-indigo-700 px-1 py-1.5">Sesuai SLA</th>
-                                        <th class="border border-indigo-700 px-1 py-1.5">Melebihi SLA</th>
+                                        <th class="border border-indigo-700 px-1/1.5">Melebihi SLA</th>
                                         <th class="border border-indigo-700 px-1 py-1.5 bg-indigo-900">Total</th>
                                     </tr>
                                 </thead>
@@ -253,15 +253,17 @@
             }
         });
 
-        // Fungsi untuk Autohide Sidebar
+        // Fungsi Autohide Sidebar + Resize otomatis Chart.js agar memenuhi lebar layar
         function toggleSidebar() {
             const sidebar = document.getElementById('sidebar');
-            // Menambah kelas CSS untuk menggeser/menyembunyikan sidebar ke kiri
-            if (sidebar.classList.contains('-translate-x-full')) {
-                sidebar.classList.remove('-translate-x-full');
-            } else {
-                sidebar.classList.add('-translate-x-full');
-            }
+            // Menambah kelas untuk menggeser sidebar keluar layar ke kiri
+            sidebar.classList.toggle('-translate-x-full');
+            
+            // Beri sedikit jeda agar animasi CSS selesai, lalu paksa Chart.js menyesuaikan ukuran baru
+            setTimeout(() => {
+                if (window.monthlyChartInstance) window.monthlyChartInstance.resize();
+                if (window.pieChartInstance) window.pieChartInstance.resize();
+            }, 300);
         }
 
         function loadData() {
